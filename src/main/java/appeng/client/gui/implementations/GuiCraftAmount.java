@@ -70,6 +70,7 @@ public class GuiCraftAmount extends AEBaseGui
 	public GuiCraftAmount( final InventoryPlayer inventoryPlayer, final ITerminalHost te )
 	{
 		super( new ContainerCraftAmount( inventoryPlayer, te ) );
+        this.loadGuiBackgroundTexture( "guis/craftAmt.png" );
 	}
 
 	@Override
@@ -172,7 +173,7 @@ public class GuiCraftAmount extends AEBaseGui
 	{
 		this.next.displayString = isShiftKeyDown() ? GuiText.Start.getLocal() : GuiText.Next.getLocal();
 
-		this.bindTexture( "guis/craftAmt.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 
 		try

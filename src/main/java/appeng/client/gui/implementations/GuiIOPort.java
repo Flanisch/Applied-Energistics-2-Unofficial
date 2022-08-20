@@ -48,6 +48,7 @@ public class GuiIOPort extends GuiUpgradeable
 	{
 		super( new ContainerIOPort( inventoryPlayer, te ) );
 		this.ySize = 166;
+        this.loadGuiBackgroundTexture( "guis/ioport.png" );
 	}
 
 	@Override

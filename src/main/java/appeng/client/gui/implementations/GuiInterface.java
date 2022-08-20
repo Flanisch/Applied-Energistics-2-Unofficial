@@ -50,6 +50,7 @@ public class GuiInterface extends GuiUpgradeable
 	{
 		super( new ContainerInterface( inventoryPlayer, te ) );
 		this.ySize = 211;
+        this.loadGuiBackgroundTexture( "guis/interface.png" );  // Load metadata
 	}
 
 	@Override
@@ -92,16 +93,16 @@ public class GuiInterface extends GuiUpgradeable
 	@Override
 	protected String getBackground()
 	{
-		switch (((ContainerInterface) this.cvb).getPatternCapacityCardsInstalled())
-		{
-			case 1:
-				return "guis/interface2.png";
-			case 2:
-				return "guis/interface3.png";
-			case 3:
-				return "guis/interface4.png";
-		}
-		return "guis/interface.png";
+        switch (((ContainerInterface) this.cvb).getPatternCapacityCardsInstalled())
+        {
+            case 1:
+                return "guis/interface2.png";
+            case 2:
+                return "guis/interface3.png";
+            case 3:
+                return "guis/interface4.png";
+        }
+        return "guis/interface.png";
 	}
 
 	@Override

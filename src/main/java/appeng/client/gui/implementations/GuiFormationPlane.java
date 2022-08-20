@@ -47,6 +47,7 @@ public class GuiFormationPlane extends GuiUpgradeable
 	{
 		super( new ContainerFormationPlane( inventoryPlayer, te ) );
 		this.ySize = 251;
+        this.loadGuiBackgroundTexture( "guis/storagebus.png" );
 	}
 
 	@Override

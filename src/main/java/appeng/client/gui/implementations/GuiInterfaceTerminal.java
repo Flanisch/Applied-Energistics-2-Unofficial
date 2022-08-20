@@ -134,6 +134,8 @@ public class GuiInterfaceTerminal extends AEBaseGui implements IDropToFillTextFi
 		guiButtonBrokenRecipes = new GuiImgButton( 0, 0, Settings.ACTIONS,  null );
 
 		terminalStyleBox = new GuiImgButton( 0, 0, Settings.TERMINAL_STYLE, null );
+
+        this.loadGuiBackgroundTexture( "guis/newinterfaceterminal.png" );
 	}
 
 	private void setScrollBar()
@@ -364,7 +366,7 @@ public class GuiInterfaceTerminal extends AEBaseGui implements IDropToFillTextFi
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/newinterfaceterminal.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, 53 );
 
 		int offset = 51;

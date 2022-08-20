@@ -42,6 +42,7 @@ public class GuiInscriber extends AEBaseGui
 		this.cvc = (ContainerInscriber) this.inventorySlots;
 		this.ySize = 176;
 		this.xSize = this.hasToolbox() ? 246 : 211;
+        this.loadGuiBackgroundTexture( "guis/inscriber.png" );
 	}
 
 	private boolean hasToolbox()
@@ -70,7 +71,7 @@ public class GuiInscriber extends AEBaseGui
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/inscriber.png" );
+		this.bindGuiTexture();
 		this.pb.xPosition = 135 + this.guiLeft;
 		this.pb.yPosition = 39 + this.guiTop;
 

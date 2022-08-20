@@ -58,6 +58,7 @@ public class GuiLevelEmitter extends GuiUpgradeable
 	public GuiLevelEmitter( final InventoryPlayer inventoryPlayer, final PartLevelEmitter te )
 	{
 		super( new ContainerLevelEmitter( inventoryPlayer, te ) );
+        this.loadGuiBackgroundTexture( "guis/lvlemitter.png" );
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import appeng.core.AELog;
 import appeng.core.AppEng;
 import appeng.core.localization.GuiText;
 import appeng.core.localization.GuiColors;
+import appeng.core.features.ColorsMetadataSection;
 import appeng.core.sync.network.NetworkHandler;
 import appeng.core.sync.packets.PacketInventoryAction;
 import appeng.core.sync.packets.PacketSwapSlots;
@@ -51,6 +52,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -81,7 +83,9 @@ public abstract class AEBaseGui extends GuiContainer
 	private ItemStack dbl_whichItem;
 	private Slot bl_clicked;
 	private boolean subGui;
-
+    private ColorsMetadataSection cmSection;
+    private ResourceLocation guiTextureLocation;
+    
 	public AEBaseGui( final Container container )
 	{
 		super( container );
@@ -792,9 +796,13 @@ public abstract class AEBaseGui extends GuiContainer
 
 	public void bindTexture( final String base, final String file )
 	{
-		final ResourceLocation loc = new ResourceLocation( base, "textures/" + file );
-		this.mc.getTextureManager().bindTexture( loc );
+		this.mc.getTextureManager().bindTexture( new ResourceLocation( base, file ) );
 	}
+
+    public void bindGuiTexture()
+    {
+        this.mc.getTextureManager().bindTexture( guiTextureLocation );
+    }
 
 	protected void drawItem( final int x, final int y, final ItemStack is )
 	{
@@ -1000,9 +1008,44 @@ public abstract class AEBaseGui extends GuiContainer
 
 	public void bindTexture( final String file )
 	{
-		final ResourceLocation loc = new ResourceLocation( AppEng.MOD_ID, "textures/" + file );
-		this.mc.getTextureManager().bindTexture( loc );
+		this.mc.getTextureManager().bindTexture( new ResourceLocation( AppEng.MOD_ID, "textures/" + file ) );
 	}
+
+    public void loadGuiBackgroundTexture( final String file )
+    {   
+        loadGuiBackgroundTexture( AppEng.MOD_ID, file );
+    }
+
+    public void loadGuiBackgroundTexture( final String base, final String file )
+    {
+        guiTextureLocation = new ResourceLocation( base, "textures/" + file );
+        loadMetadata(guiTextureLocation);
+    }
+
+    private void loadMetadata(ResourceLocation sourceTexture)
+    {
+        AELog.warn( "AE2: Colors-SEARCH in: " + sourceTexture.toString());
+        try
+        {
+            IResource ir = Minecraft.getMinecraft().getResourceManager().getResource(sourceTexture);
+            if (ir.hasMetadata()) 
+            {
+                AELog.warn("AE2: GOT Colors!");
+                cmSection = (ColorsMetadataSection) ir.getMetadata( "colors" );
+            }
+        }
+        catch ( IOException ignore ) {}
+    }
+
+    protected int getTextColorOrDefault(String textType, int defaultColor)
+    {
+        return cmSection != null ? cmSection.getTextColorOrDefault(textType, defaultColor) : defaultColor;
+    }
+
+    protected int getRectColorOrDefault(String rectType, int defaultColor)
+    {
+        return cmSection != null ? cmSection.getRectColorOrDefault(rectType, defaultColor) : defaultColor;
+    }
 
 	public void func_146977_a( final Slot s )
 	{

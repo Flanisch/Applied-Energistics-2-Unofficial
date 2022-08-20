@@ -32,6 +32,8 @@ import appeng.client.texture.ExtraItemTextures;
 import appeng.core.AEConfig;
 import appeng.core.AELog;
 import appeng.core.CommonHelper;
+import appeng.core.features.ColorsMetadataSection;
+import appeng.core.features.ColorsMetadataSectionSerializer;
 import appeng.core.sync.network.NetworkHandler;
 import appeng.core.sync.packets.PacketAssemblerAnimation;
 import appeng.core.sync.packets.PacketValueConfig;
@@ -83,391 +85,393 @@ import java.util.Random;
 
 public class ClientHelper extends ServerHelper
 {
-	private final static String KEY_CATEGORY = "key.appliedenergistics2.category";
+    private final static String KEY_CATEGORY = "key.appliedenergistics2.category";
 
-	private final EnumMap<ActionKey, KeyBinding> bindings = new EnumMap<>( ActionKey.class );
+    private final EnumMap<ActionKey, KeyBinding> bindings = new EnumMap<>( ActionKey.class );
 
-	private static final RenderItem ITEM_RENDERER = new RenderItem();
-	private static final RenderBlocks BLOCK_RENDERER = new RenderBlocks();
+    private static final RenderItem ITEM_RENDERER = new RenderItem();
+    private static final RenderBlocks BLOCK_RENDERER = new RenderBlocks();
 
-	@SubscribeEvent
-	public void postPlayerRender( final RenderLivingEvent.Pre p )
-	{
-		final PlayerColor player = TickHandler.INSTANCE.getPlayerColors().get( p.entity.getEntityId() );
-		if( player != null )
-		{
-			final AEColor col = player.myColor;
+    @SubscribeEvent
+    public void postPlayerRender( final RenderLivingEvent.Pre p )
+    {
+        final PlayerColor player = TickHandler.INSTANCE.getPlayerColors().get( p.entity.getEntityId() );
+        if( player != null )
+        {
+            final AEColor col = player.myColor;
 
-			final float r = 0xff & ( col.mediumVariant >> 16 );
-			final float g = 0xff & ( col.mediumVariant >> 8 );
-			final float b = 0xff & ( col.mediumVariant );
-			GL11.glColor3f( r / 255.0f, g / 255.0f, b / 255.0f );
-		}
-	}
+            final float r = 0xff & ( col.mediumVariant >> 16 );
+            final float g = 0xff & ( col.mediumVariant >> 8 );
+            final float b = 0xff & ( col.mediumVariant );
+            GL11.glColor3f( r / 255.0f, g / 255.0f, b / 255.0f );
+        }
+    }
 
-	@Override
-	public void init()
-	{
-		MinecraftForge.EVENT_BUS.register( this );
+    @Override
+    public void init()
+    {
+        MinecraftForge.EVENT_BUS.register( this );
 
-		for( ActionKey key : ActionKey.values() )
-		{
-			final KeyBinding binding = new KeyBinding( key.getTranslationKey(), key.getDefaultKey(), KEY_CATEGORY );
-			ClientRegistry.registerKeyBinding( binding );
-			this.bindings.put( key, binding );
-		}
-	}
+        for( ActionKey key : ActionKey.values() )
+        {
+            final KeyBinding binding = new KeyBinding( key.getTranslationKey(), key.getDefaultKey(), KEY_CATEGORY );
+            ClientRegistry.registerKeyBinding( binding );
+            this.bindings.put( key, binding );
+        }
 
-	@SubscribeEvent
-	public void renderWorldLastEvent( RenderWorldLastEvent event) {
-		HighlighterHandler.tick(event);
-	}
+        Minecraft.getMinecraft().getResourcePackRepository().rprMetadataSerializer.registerMetadataSectionType(new ColorsMetadataSectionSerializer(), ColorsMetadataSection.class);
+    }
 
-	@Override
-	public World getWorld()
-	{
-		if( Platform.isClient() )
-		{
-			return Minecraft.getMinecraft().theWorld;
-		}
-		else
-		{
-			return super.getWorld();
-		}
-	}
+    @SubscribeEvent
+    public void renderWorldLastEvent( RenderWorldLastEvent event) {
+        HighlighterHandler.tick(event);
+    }
 
-	@Override
-	public void bindTileEntitySpecialRenderer( final Class tile, final AEBaseBlock blk )
-	{
-		final BaseBlockRender bbr = blk.getRendererInstance().getRendererInstance();
-		if( bbr.hasTESR() && tile != null )
-		{
-			ClientRegistry.bindTileEntitySpecialRenderer( tile, new TESRWrapper( bbr ) );
-		}
-	}
+    @Override
+    public World getWorld()
+    {
+        if( Platform.isClient() )
+        {
+            return Minecraft.getMinecraft().theWorld;
+        }
+        else
+        {
+            return super.getWorld();
+        }
+    }
 
-	@Override
-	public List<EntityPlayer> getPlayers()
-	{
-		if( Platform.isClient() )
-		{
-			final List<EntityPlayer> o = new ArrayList<EntityPlayer>();
-			o.add( Minecraft.getMinecraft().thePlayer );
-			return o;
-		}
-		else
-		{
-			return super.getPlayers();
-		}
-	}
+    @Override
+    public void bindTileEntitySpecialRenderer( final Class tile, final AEBaseBlock blk )
+    {
+        final BaseBlockRender bbr = blk.getRendererInstance().getRendererInstance();
+        if( bbr.hasTESR() && tile != null )
+        {
+            ClientRegistry.bindTileEntitySpecialRenderer( tile, new TESRWrapper( bbr ) );
+        }
+    }
 
-	@Override
-	public void spawnEffect( final EffectType effect, final World worldObj, final double posX, final double posY, final double posZ, final Object o )
-	{
-		if( AEConfig.instance.enableEffects )
-		{
-			switch( effect )
-			{
-				case Assembler:
-					this.spawnAssembler( worldObj, posX, posY, posZ, o );
-					return;
-				case Vibrant:
-					this.spawnVibrant( worldObj, posX, posY, posZ );
-					return;
-				case Crafting:
-					this.spawnCrafting( worldObj, posX, posY, posZ );
-					return;
-				case Energy:
-					this.spawnEnergy( worldObj, posX, posY, posZ );
-					return;
-				case Lightning:
-					this.spawnLightning( worldObj, posX, posY, posZ );
-					return;
-				case LightningArc:
-					this.spawnLightningArc( worldObj, posX, posY, posZ, (Vec3) o );
-					return;
-				default:
-			}
-		}
-	}
+    @Override
+    public List<EntityPlayer> getPlayers()
+    {
+        if( Platform.isClient() )
+        {
+            final List<EntityPlayer> o = new ArrayList<EntityPlayer>();
+            o.add( Minecraft.getMinecraft().thePlayer );
+            return o;
+        }
+        else
+        {
+            return super.getPlayers();
+        }
+    }
 
-	private void spawnAssembler( final World worldObj, final double posX, final double posY, final double posZ, final Object o )
-	{
-		final PacketAssemblerAnimation paa = (PacketAssemblerAnimation) o;
+    @Override
+    public void spawnEffect( final EffectType effect, final World worldObj, final double posX, final double posY, final double posZ, final Object o )
+    {
+        if( AEConfig.instance.enableEffects )
+        {
+            switch( effect )
+            {
+                case Assembler:
+                    this.spawnAssembler( worldObj, posX, posY, posZ, o );
+                    return;
+                case Vibrant:
+                    this.spawnVibrant( worldObj, posX, posY, posZ );
+                    return;
+                case Crafting:
+                    this.spawnCrafting( worldObj, posX, posY, posZ );
+                    return;
+                case Energy:
+                    this.spawnEnergy( worldObj, posX, posY, posZ );
+                    return;
+                case Lightning:
+                    this.spawnLightning( worldObj, posX, posY, posZ );
+                    return;
+                case LightningArc:
+                    this.spawnLightningArc( worldObj, posX, posY, posZ, (Vec3) o );
+                    return;
+                default:
+            }
+        }
+    }
 
-		final AssemblerFX fx = new AssemblerFX( Minecraft.getMinecraft().theWorld, posX, posY, posZ, 0.0D, 0.0D, 0.0D, paa.rate, paa.is );
-		Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-	}
+    private void spawnAssembler( final World worldObj, final double posX, final double posY, final double posZ, final Object o )
+    {
+        final PacketAssemblerAnimation paa = (PacketAssemblerAnimation) o;
 
-	private void spawnVibrant( final World w, final double x, final double y, final double z )
-	{
-		if( CommonHelper.proxy.shouldAddParticles( Platform.getRandom() ) )
-		{
-			final double d0 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
-			final double d1 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
-			final double d2 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
+        final AssemblerFX fx = new AssemblerFX( Minecraft.getMinecraft().theWorld, posX, posY, posZ, 0.0D, 0.0D, 0.0D, paa.rate, paa.is );
+        Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+    }
 
-			final VibrantFX fx = new VibrantFX( w, x + d0, y + d1, z + d2, 0.0D, 0.0D, 0.0D );
-			Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-		}
-	}
+    private void spawnVibrant( final World w, final double x, final double y, final double z )
+    {
+        if( CommonHelper.proxy.shouldAddParticles( Platform.getRandom() ) )
+        {
+            final double d0 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
+            final double d1 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
+            final double d2 = ( Platform.getRandomFloat() - 0.5F ) * 0.26D;
 
-	private void spawnCrafting( final World w, final double posX, final double posY, final double posZ )
-	{
-		final float x = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
-		final float y = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
-		final float z = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+            final VibrantFX fx = new VibrantFX( w, x + d0, y + d1, z + d2, 0.0D, 0.0D, 0.0D );
+            Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+        }
+    }
 
-		final CraftingFx fx = new CraftingFx( w, posX + x, posY + y, posZ + z, Items.diamond );
+    private void spawnCrafting( final World w, final double posX, final double posY, final double posZ )
+    {
+        final float x = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+        final float y = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+        final float z = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
 
-		fx.motionX = -x * 0.2;
-		fx.motionY = -y * 0.2;
-		fx.motionZ = -z * 0.2;
+        final CraftingFx fx = new CraftingFx( w, posX + x, posY + y, posZ + z, Items.diamond );
 
-		Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-	}
+        fx.motionX = -x * 0.2;
+        fx.motionY = -y * 0.2;
+        fx.motionZ = -z * 0.2;
 
-	private void spawnEnergy( final World w, final double posX, final double posY, final double posZ )
-	{
-		final float x = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
-		final float y = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
-		final float z = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+        Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+    }
 
-		final EnergyFx fx = new EnergyFx( w, posX + x, posY + y, posZ + z, Items.diamond );
+    private void spawnEnergy( final World w, final double posX, final double posY, final double posZ )
+    {
+        final float x = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+        final float y = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
+        final float z = (float) ( ( ( Platform.getRandomInt() % 100 ) * 0.01 ) - 0.5 ) * 0.7f;
 
-		fx.motionX = -x * 0.1;
-		fx.motionY = -y * 0.1;
-		fx.motionZ = -z * 0.1;
+        final EnergyFx fx = new EnergyFx( w, posX + x, posY + y, posZ + z, Items.diamond );
 
-		Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-	}
+        fx.motionX = -x * 0.1;
+        fx.motionY = -y * 0.1;
+        fx.motionZ = -z * 0.1;
 
-	private void spawnLightning( final World worldObj, final double posX, final double posY, final double posZ )
-	{
-		final LightningFX fx = new LightningFX( worldObj, posX, posY + 0.3f, posZ, 0.0f, 0.0f, 0.0f );
-		Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-	}
+        Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+    }
 
-	private void spawnLightningArc( final World worldObj, final double posX, final double posY, final double posZ, final Vec3 second )
-	{
-		final LightningFX fx = new LightningArcFX( worldObj, posX, posY, posZ, second.xCoord, second.yCoord, second.zCoord, 0.0f, 0.0f, 0.0f );
-		Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-	}
+    private void spawnLightning( final World worldObj, final double posX, final double posY, final double posZ )
+    {
+        final LightningFX fx = new LightningFX( worldObj, posX, posY + 0.3f, posZ, 0.0f, 0.0f, 0.0f );
+        Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+    }
 
-	@Override
-	public boolean shouldAddParticles( final Random r )
-	{
-		final int setting = Minecraft.getMinecraft().gameSettings.particleSetting;
-		if( setting == 2 )
-		{
-			return false;
-		}
-		if( setting == 0 )
-		{
-			return true;
-		}
-		return r.nextInt( 2 * ( setting + 1 ) ) == 0;
-	}
+    private void spawnLightningArc( final World worldObj, final double posX, final double posY, final double posZ, final Vec3 second )
+    {
+        final LightningFX fx = new LightningArcFX( worldObj, posX, posY, posZ, second.xCoord, second.yCoord, second.zCoord, 0.0f, 0.0f, 0.0f );
+        Minecraft.getMinecraft().effectRenderer.addEffect( fx );
+    }
 
-	@Override
-	public MovingObjectPosition getMOP()
-	{
-		return Minecraft.getMinecraft().objectMouseOver;
-	}
+    @Override
+    public boolean shouldAddParticles( final Random r )
+    {
+        final int setting = Minecraft.getMinecraft().gameSettings.particleSetting;
+        if( setting == 2 )
+        {
+            return false;
+        }
+        if( setting == 0 )
+        {
+            return true;
+        }
+        return r.nextInt( 2 * ( setting + 1 ) ) == 0;
+    }
 
-	@Override
-	public void doRenderItem( final ItemStack itemstack, final World w )
-	{
-		if( itemstack != null )
-		{
-			final EntityItem entityitem = new EntityItem( w, 0.0D, 0.0D, 0.0D, itemstack );
-			entityitem.getEntityItem().stackSize = 1;
+    @Override
+    public MovingObjectPosition getMOP()
+    {
+        return Minecraft.getMinecraft().objectMouseOver;
+    }
 
-			// set all this stuff and then do shit? meh?
-			entityitem.hoverStart = 0;
-			entityitem.age = 0;
-			entityitem.rotationYaw = 0;
+    @Override
+    public void doRenderItem( final ItemStack itemstack, final World w )
+    {
+        if( itemstack != null )
+        {
+            final EntityItem entityitem = new EntityItem( w, 0.0D, 0.0D, 0.0D, itemstack );
+            entityitem.getEntityItem().stackSize = 1;
 
-			GL11.glPushMatrix();
-			GL11.glTranslatef( 0, -0.04F, 0 );
-			GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
-			// GL11.glDisable( GL11.GL_CULL_FACE );
+            // set all this stuff and then do shit? meh?
+            entityitem.hoverStart = 0;
+            entityitem.age = 0;
+            entityitem.rotationYaw = 0;
 
-			if( itemstack.isItemEnchanted() || itemstack.getItem().requiresMultipleRenderPasses() )
-			{
-				GL11.glTranslatef( 0.0f, -0.05f, -0.25f );
-				GL11.glScalef( 1.0f / 1.5f, 1.0f / 1.5f, 1.0f / 1.5f );
-				// GL11.glTranslated( -8.0, -12.2, -10.6 );
-				GL11.glScalef( 1.0f, -1.0f, 0.005f );
-				// GL11.glScalef( 1.0f , -1.0f, 1.0f );
+            GL11.glPushMatrix();
+            GL11.glTranslatef( 0, -0.04F, 0 );
+            GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
+            // GL11.glDisable( GL11.GL_CULL_FACE );
 
-				final Block block = Block.getBlockFromItem( itemstack.getItem() );
-				if( ( itemstack.getItemSpriteNumber() == 0 && block != null && RenderBlocks.renderItemIn3d( block.getRenderType() ) ) )
-				{
-					GL11.glRotatef( 25.0f, 1.0f, 0.0f, 0.0f );
-					GL11.glRotatef( 15.0f, 0.0f, 1.0f, 0.0f );
-					GL11.glRotatef( 30.0f, 0.0f, 1.0f, 0.0f );
-				}
+            if( itemstack.isItemEnchanted() || itemstack.getItem().requiresMultipleRenderPasses() )
+            {
+                GL11.glTranslatef( 0.0f, -0.05f, -0.25f );
+                GL11.glScalef( 1.0f / 1.5f, 1.0f / 1.5f, 1.0f / 1.5f );
+                // GL11.glTranslated( -8.0, -12.2, -10.6 );
+                GL11.glScalef( 1.0f, -1.0f, 0.005f );
+                // GL11.glScalef( 1.0f , -1.0f, 1.0f );
 
-				final IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer( itemstack, IItemRenderer.ItemRenderType.ENTITY );
-				if( customRenderer != null && !( itemstack.getItem() instanceof ItemBlock ) )
-				{
-					if( customRenderer.shouldUseRenderHelper( IItemRenderer.ItemRenderType.ENTITY, itemstack, IItemRenderer.ItemRendererHelper.BLOCK_3D ) )
-					{
-						GL11.glTranslatef( 0, -0.04F, 0 );
-						GL11.glScalef( 0.7f, 0.7f, 0.7f );
-						GL11.glRotatef( 35, 1, 0, 0 );
-						GL11.glRotatef( 45, 0, 1, 0 );
-						GL11.glRotatef( -90, 0, 1, 0 );
-					}
-				}
-				else if( itemstack.getItem() instanceof ItemBlock )
-				{
-					GL11.glTranslatef( 0, -0.04F, 0 );
-					GL11.glScalef( 1.1f, 1.1f, 1.1f );
-					GL11.glRotatef( -90, 0, 1, 0 );
-				}
-				else
-				{
-					GL11.glTranslatef( 0, -0.14F, 0 );
-					GL11.glScalef( 0.8f, 0.8f, 0.8f );
-				}
+                final Block block = Block.getBlockFromItem( itemstack.getItem() );
+                if( ( itemstack.getItemSpriteNumber() == 0 && block != null && RenderBlocks.renderItemIn3d( block.getRenderType() ) ) )
+                {
+                    GL11.glRotatef( 25.0f, 1.0f, 0.0f, 0.0f );
+                    GL11.glRotatef( 15.0f, 0.0f, 1.0f, 0.0f );
+                    GL11.glRotatef( 30.0f, 0.0f, 1.0f, 0.0f );
+                }
 
-				RenderItem.renderInFrame = true;
-				RenderManager.instance.renderEntityWithPosYaw( entityitem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F );
-				RenderItem.renderInFrame = false;
-			}
-			else
-			{
-				GL11.glScalef( 1.0f / 42.0f, 1.0f / 42.0f, 1.0f / 42.0f );
-				GL11.glTranslated( -8.0, -10.2, -10.4 );
-				GL11.glScalef( 1.0f, 1.0f, 0.005f );
+                final IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer( itemstack, IItemRenderer.ItemRenderType.ENTITY );
+                if( customRenderer != null && !( itemstack.getItem() instanceof ItemBlock ) )
+                {
+                    if( customRenderer.shouldUseRenderHelper( IItemRenderer.ItemRenderType.ENTITY, itemstack, IItemRenderer.ItemRendererHelper.BLOCK_3D ) )
+                    {
+                        GL11.glTranslatef( 0, -0.04F, 0 );
+                        GL11.glScalef( 0.7f, 0.7f, 0.7f );
+                        GL11.glRotatef( 35, 1, 0, 0 );
+                        GL11.glRotatef( 45, 0, 1, 0 );
+                        GL11.glRotatef( -90, 0, 1, 0 );
+                    }
+                }
+                else if( itemstack.getItem() instanceof ItemBlock )
+                {
+                    GL11.glTranslatef( 0, -0.04F, 0 );
+                    GL11.glScalef( 1.1f, 1.1f, 1.1f );
+                    GL11.glRotatef( -90, 0, 1, 0 );
+                }
+                else
+                {
+                    GL11.glTranslatef( 0, -0.14F, 0 );
+                    GL11.glScalef( 0.8f, 0.8f, 0.8f );
+                }
 
-				RenderItem.renderInFrame = false;
-				final FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
-				if( !ForgeHooksClient.renderInventoryItem( BLOCK_RENDERER, Minecraft.getMinecraft().renderEngine, itemstack, true, 0, 0, 0 ) )
-				{
-					ITEM_RENDERER.renderItemIntoGUI( fr, Minecraft.getMinecraft().renderEngine, itemstack, 0, 0, false );
-				}
-			}
+                RenderItem.renderInFrame = true;
+                RenderManager.instance.renderEntityWithPosYaw( entityitem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F );
+                RenderItem.renderInFrame = false;
+            }
+            else
+            {
+                GL11.glScalef( 1.0f / 42.0f, 1.0f / 42.0f, 1.0f / 42.0f );
+                GL11.glTranslated( -8.0, -10.2, -10.4 );
+                GL11.glScalef( 1.0f, 1.0f, 0.005f );
 
-			GL11.glPopMatrix();
-		}
-	}
+                RenderItem.renderInFrame = false;
+                final FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+                if( !ForgeHooksClient.renderInventoryItem( BLOCK_RENDERER, Minecraft.getMinecraft().renderEngine, itemstack, true, 0, 0, 0 ) )
+                {
+                    ITEM_RENDERER.renderItemIntoGUI( fr, Minecraft.getMinecraft().renderEngine, itemstack, 0, 0, false );
+                }
+            }
 
-	@Override
-	public void postInit()
-	{
-		RenderingRegistry.registerBlockHandler( WorldRender.INSTANCE );
-		RenderManager.instance.entityRenderMap.put( EntityTinyTNTPrimed.class, new RenderTinyTNTPrimed() );
-		RenderManager.instance.entityRenderMap.put( EntityFloatingItem.class, new RenderFloatingItem() );
-	}
+            GL11.glPopMatrix();
+        }
+    }
 
-	@Override
-	public CableRenderMode getRenderMode()
-	{
-		if( Platform.isServer() )
-		{
-			return super.getRenderMode();
-		}
+    @Override
+    public void postInit()
+    {
+        RenderingRegistry.registerBlockHandler( WorldRender.INSTANCE );
+        RenderManager.instance.entityRenderMap.put( EntityTinyTNTPrimed.class, new RenderTinyTNTPrimed() );
+        RenderManager.instance.entityRenderMap.put( EntityFloatingItem.class, new RenderFloatingItem() );
+    }
 
-		final Minecraft mc = Minecraft.getMinecraft();
-		final EntityPlayer player = mc.thePlayer;
+    @Override
+    public CableRenderMode getRenderMode()
+    {
+        if( Platform.isServer() )
+        {
+            return super.getRenderMode();
+        }
 
-		return this.renderModeForPlayer( player );
-	}
+        final Minecraft mc = Minecraft.getMinecraft();
+        final EntityPlayer player = mc.thePlayer;
 
-	@Override
-	public void triggerUpdates()
-	{
-		final Minecraft mc = Minecraft.getMinecraft();
-		if( mc == null || mc.thePlayer == null || mc.theWorld == null )
-		{
-			return;
-		}
+        return this.renderModeForPlayer( player );
+    }
 
-		final EntityPlayer player = mc.thePlayer;
+    @Override
+    public void triggerUpdates()
+    {
+        final Minecraft mc = Minecraft.getMinecraft();
+        if( mc == null || mc.thePlayer == null || mc.theWorld == null )
+        {
+            return;
+        }
 
-		final int x = (int) player.posX;
-		final int y = (int) player.posY;
-		final int z = (int) player.posZ;
+        final EntityPlayer player = mc.thePlayer;
 
-		final int range = 16 * 16;
+        final int x = (int) player.posX;
+        final int y = (int) player.posY;
+        final int z = (int) player.posZ;
 
-		mc.theWorld.markBlockRangeForRenderUpdate( x - range, y - range, z - range, x + range, y + range, z + range );
-	}
+        final int range = 16 * 16;
 
-	@Override
-	public void missingCoreMod()
-	{
-		throw new MissingCoreMod();
-	}
+        mc.theWorld.markBlockRangeForRenderUpdate( x - range, y - range, z - range, x + range, y + range, z + range );
+    }
 
-	@SubscribeEvent
-	public void wheelEvent( final MouseEvent me )
-	{
-		if( me.isCanceled() || me.dwheel == 0 )
-		{
-			return;
-		}
+    @Override
+    public void missingCoreMod()
+    {
+        throw new MissingCoreMod();
+    }
 
-		final Minecraft mc = Minecraft.getMinecraft();
-		final EntityPlayer player = mc.thePlayer;
-		final ItemStack is = player.getHeldItem();
+    @SubscribeEvent
+    public void wheelEvent( final MouseEvent me )
+    {
+        if( me.isCanceled() || me.dwheel == 0 )
+        {
+            return;
+        }
 
-		if( is != null && is.getItem() instanceof IMouseWheelItem && player.isSneaking() )
-		{
-			try
-			{
-				NetworkHandler.instance.sendToServer( new PacketValueConfig( "Item", me.dwheel > 0 ? "WheelUp" : "WheelDown" ) );
-				me.setCanceled( true );
-			}
-			catch( final IOException e )
-			{
-				AELog.debug( e );
-			}
-		}
-	}
+        final Minecraft mc = Minecraft.getMinecraft();
+        final EntityPlayer player = mc.thePlayer;
+        final ItemStack is = player.getHeldItem();
 
-	@SubscribeEvent
-	public void updateTextureSheet( final TextureStitchEvent.Pre ev )
-	{
-		if( ev.map.getTextureType() == 1 )
-		{
-			for( final ExtraItemTextures et : ExtraItemTextures.values() )
-			{
-				et.registerIcon( ev.map );
-			}
-		}
+        if( is != null && is.getItem() instanceof IMouseWheelItem && player.isSneaking() )
+        {
+            try
+            {
+                NetworkHandler.instance.sendToServer( new PacketValueConfig( "Item", me.dwheel > 0 ? "WheelUp" : "WheelDown" ) );
+                me.setCanceled( true );
+            }
+            catch( final IOException e )
+            {
+                AELog.debug( e );
+            }
+        }
+    }
 
-		if( ev.map.getTextureType() == 0 )
-		{
-			for( final ExtraBlockTextures et : ExtraBlockTextures.values() )
-			{
-				et.registerIcon( ev.map );
-			}
+    @SubscribeEvent
+    public void updateTextureSheet( final TextureStitchEvent.Pre ev )
+    {
+        if( ev.map.getTextureType() == 1 )
+        {
+            for( final ExtraItemTextures et : ExtraItemTextures.values() )
+            {
+                et.registerIcon( ev.map );
+            }
+        }
 
-			for( final CableBusTextures cb : CableBusTextures.values() )
-			{
-				cb.registerIcon( ev.map );
-			}
-		}
-	}
+        if( ev.map.getTextureType() == 0 )
+        {
+            for( final ExtraBlockTextures et : ExtraBlockTextures.values() )
+            {
+                et.registerIcon( ev.map );
+            }
 
-	@Override
-	public boolean isKeyPressed( ActionKey key )
-	{
-		return this.bindings.get( key ).isPressed();
-	}
+            for( final CableBusTextures cb : CableBusTextures.values() )
+            {
+                cb.registerIcon( ev.map );
+            }
+        }
+    }
 
-	@Override
-	public boolean isActionKey( ActionKey key, int pressedKeyCode )
-	{
-		return isActiveAndMatches( this.bindings.get( key ), pressedKeyCode );
-	}
+    @Override
+    public boolean isKeyPressed( ActionKey key )
+    {
+        return this.bindings.get( key ).isPressed();
+    }
 
-	private boolean isActiveAndMatches(KeyBinding keyBinding, int keyCode) {
-//		return keyCode != 0 && keyCode == keyBinding.getKeyCode() && keyBinding.getKeyConflictContext().isActive() && keyBinding.getKeyModifier().isActive(keyBinding.getKeyConflictContext());
-		return keyCode != 0 && keyCode == keyBinding.getKeyCode();
-	}
+    @Override
+    public boolean isActionKey( ActionKey key, int pressedKeyCode )
+    {
+        return isActiveAndMatches( this.bindings.get( key ), pressedKeyCode );
+    }
+
+    private boolean isActiveAndMatches(KeyBinding keyBinding, int keyCode) {
+//      return keyCode != 0 && keyCode == keyBinding.getKeyCode() && keyBinding.getKeyConflictContext().isActive() && keyBinding.getKeyModifier().isActive(keyBinding.getKeyConflictContext());
+        return keyCode != 0 && keyCode == keyBinding.getKeyCode();
+    }
 }

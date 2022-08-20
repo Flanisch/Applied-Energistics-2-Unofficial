@@ -110,6 +110,8 @@ public class GuiCraftConfirm extends AEBaseGui
 		{
 			this.OriginalGui = GuiBridge.GUI_PATTERN_TERMINAL_EX;
 		}
+
+        this.loadGuiBackgroundTexture( "guis/craftingreport.png" );
 	}
 
 	boolean isAutoStart()
@@ -370,7 +372,7 @@ public class GuiCraftConfirm extends AEBaseGui
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
 		this.setScrollBar();
-		this.bindTexture( "guis/craftingreport.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 

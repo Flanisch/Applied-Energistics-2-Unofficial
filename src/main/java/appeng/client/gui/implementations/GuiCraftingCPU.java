@@ -91,6 +91,7 @@ public class GuiCraftingCPU extends AEBaseGui implements ISortSource
 	public GuiCraftingCPU( final InventoryPlayer inventoryPlayer, final Object te )
 	{
 		this( new ContainerCraftingCPU( inventoryPlayer, te ) );
+        this.loadGuiBackgroundTexture( "guis/craftingcpu.png" );
 	}
 
 	protected GuiCraftingCPU( final ContainerCraftingCPU container )
@@ -342,7 +343,7 @@ public class GuiCraftingCPU extends AEBaseGui implements ISortSource
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/craftingcpu.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 

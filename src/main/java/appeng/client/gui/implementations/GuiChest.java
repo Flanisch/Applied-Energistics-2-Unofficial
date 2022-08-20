@@ -41,6 +41,7 @@ public class GuiChest extends AEBaseGui
 	{
 		super( new ContainerChest( inventoryPlayer, te ) );
 		this.ySize = 166;
+        this.loadGuiBackgroundTexture( "guis/chest.png" );
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class GuiChest extends AEBaseGui
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/chest.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 }

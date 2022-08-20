@@ -52,6 +52,7 @@ public class GuiCellWorkbench extends GuiUpgradeable
 		super( new ContainerCellWorkbench( inventoryPlayer, te ) );
 		this.workbench = (ContainerCellWorkbench) this.inventorySlots;
 		this.ySize = 251;
+        this.loadGuiBackgroundTexture( "guis/cellworkbench.png" );
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class GuiCellWorkbench extends GuiUpgradeable
 	{
 		this.handleButtonVisibility();
 
-		this.bindTexture( this.getBackground() );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, 211 - 34, this.ySize );
 		if( this.drawUpgrades() )
 		{

@@ -47,6 +47,7 @@ public class GuiCondenser extends AEBaseGui
 		super( new ContainerCondenser( inventoryPlayer, te ) );
 		this.cvc = (ContainerCondenser) this.inventorySlots;
 		this.ySize = 197;
+        this.loadGuiBackgroundTexture( "guis/condenser.png" );
 	}
 
 	@Override
@@ -88,8 +89,7 @@ public class GuiCondenser extends AEBaseGui
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/condenser.png" );
-
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 }

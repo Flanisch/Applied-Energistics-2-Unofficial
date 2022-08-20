@@ -45,6 +45,7 @@ public class GuiCraftingTerm extends GuiMEMonitorable
 	{
 		super( inventoryPlayer, te, new ContainerCraftingTerm( inventoryPlayer, te ) );
 		this.setReservedSpace( 73 );
+        this.loadGuiBackgroundTexture( "guis/crafting.png" );
 	}
 
 	@Override

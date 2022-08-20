@@ -41,6 +41,7 @@ public class GuiMAC extends GuiUpgradeable
 		super( new ContainerMAC( inventoryPlayer, te ) );
 		this.ySize = 197;
 		this.container = (ContainerMAC) this.inventorySlots;
+        this.loadGuiBackgroundTexture( "guis/mac.png" );
 	}
 
 	@Override

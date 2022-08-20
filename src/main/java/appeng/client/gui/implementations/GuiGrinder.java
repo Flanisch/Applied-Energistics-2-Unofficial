@@ -34,6 +34,7 @@ public class GuiGrinder extends AEBaseGui
 	{
 		super( new ContainerGrinder( inventoryPlayer, te ) );
 		this.ySize = 176;
+        this.loadGuiBackgroundTexture( "guis/grinder.png" );
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class GuiGrinder extends AEBaseGui
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/grinder.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 }

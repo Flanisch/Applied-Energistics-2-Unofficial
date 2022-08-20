@@ -127,6 +127,8 @@ public class GuiCraftingStatus extends GuiCraftingCPU
 			}
 			this.originalGui = GuiBridge.GUI_PATTERN_TERMINAL_EX;
 		}
+
+        this.loadGuiBackgroundTexture( "guis/cpu_selector.png" );
 	}
 
 	@Override
@@ -219,7 +221,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
                 {
                     GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
                 }
-                this.bindTexture( "guis/cpu_selector.png" );
+                this.bindGuiTexture();
                 this.drawTexturedModalRect( x, y, CPU_TABLE_SLOT_XOFF, CPU_TABLE_SLOT_YOFF, CPU_TABLE_SLOT_WIDTH, CPU_TABLE_SLOT_HEIGHT );
                 GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
 
@@ -244,7 +246,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
                 if( craftingStack != null )
                 {
                     final int iconIndex = 16 * 11 + 2;
-                    this.bindTexture( "guis/states.png" );
+                    this.bindGuiTexture();
                     final int uv_y = iconIndex / 16;
                     final int uv_x = iconIndex - uv_y * 16;
 
@@ -337,7 +339,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
     public void drawBG( int offsetX, int offsetY, int mouseX, int mouseY )
     {
         super.drawBG( offsetX, offsetY, mouseX, mouseY );
-        this.bindTexture( "guis/cpu_selector.png" );
+        this.bindGuiTexture();
         this.drawTexturedModalRect( offsetX - CPU_TABLE_WIDTH, offsetY, 0, 0, CPU_TABLE_WIDTH, CPU_TABLE_HEIGHT );
     }
 

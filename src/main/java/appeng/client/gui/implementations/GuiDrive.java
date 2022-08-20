@@ -41,6 +41,7 @@ public class GuiDrive extends AEBaseGui
 	{
 		super( new ContainerDrive( inventoryPlayer, te ) );
 		this.ySize = 199;
+        this.loadGuiBackgroundTexture( "guis/drive.png" );
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class GuiDrive extends AEBaseGui
 	@Override
 	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		this.bindTexture( "guis/drive.png" );
+		this.bindGuiTexture();
 		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, this.xSize, this.ySize );
 	}
 }
